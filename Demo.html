@@ -1,0 +1,371 @@
+<html>
+<head>
+	<title> Exapption Web PUSH Demo </title>
+	<link rel="shortcut icon" type="image/x-icon" href="https://storage.googleapis.com/userengagement/common/favicon.ico" />
+
+	<!-- copy the exapption Header Js code here -->
+	<!-- Exapption code begins here -->
+	<link rel="manifest" href="https://app.exapption.com/js/manifest?app_id=57b5b8caa85dc62425636900">
+	<script type="text/javascript">
+	  (function(p,u,s,h){
+	    p._ueq=p._ueq||[];
+	    p._ueq.push(['_currentTime',Date.now()]);
+	    p._ueq.push(['enable_manual_registration',true]);
+	    s=u.createElement('script');
+	    s.type='text/javascript';s.async=true;
+	    s.src="https://app.exapption.com/js/userengage?app_id=57b5b8caa85dc62425636900";
+	    h=u.getElementsByTagName('script')[0];
+	    h.parentNode.insertBefore(s,h);
+	  })(window,document);
+	</script>
+	<!-- Exapption code ends here -->
+
+	<!-- Demo page code begins here -->
+	<script type="text/javascript">
+
+		window.onload = function() {
+		  init();
+		};
+
+		function init(){
+			updateSubscriptionStatus();
+		 	updateUserRegistrationID();
+		}
+
+		function updateUserRegistrationID(){
+			strUserRegistrationID = getUE_Registration_Id();
+			if(is_subscribed()){
+				if(strUserRegistrationID){
+				document.getElementById("span_ue_registration_id").innerText = strUserRegistrationID;
+				} else {
+					document.getElementById("span_ue_registration_id").innerText = "---";
+				}	
+			} else {
+				document.getElementById("span_ue_registration_id").innerText = "---";
+			}
+			
+		}
+
+		function register(){
+			//call to check subscription
+			if (!is_subscribed()){
+				// exapption call if set to manual invoke registration
+				registerServiceWorker(onRegSuccess);
+			}
+		}
+
+		function updateSubscriptionStatus(){
+			obj_push_status = document.getElementById("span_push_status");
+			if(is_subscribed()){
+				span_push_status.innerText = "subscribed";
+			} else {
+				span_push_status.innerText = "unsubscribed";
+			}
+		}
+
+		function unregister(){
+			if(is_subscribed()){
+				try{
+					// exapption call if unregister notifications
+					unRegisterServiceWorker(onUnRegSuccess);	
+				}
+				catch (err){
+					// do nothing to avoid service worker error.
+					console.log("Un-subscribe error");
+				}	
+			}
+		}
+
+		function onRegSuccess(ue_registration_id){
+			// alert("received" + ue_registration_id);
+			init();
+		}
+
+		function onUnRegSuccess(msg){
+			// alert(msg);
+			init();
+		}
+
+		function sendNotification(){
+
+			var title = document.getElementById("txtTitle").value;
+			var body = document.getElementById("txtBody").value;
+			var link = document.getElementById("txtlink").value;
+			var icon = document.getElementById("txticon").value;
+			sendPN(title, body, link, icon);
+		}
+
+		function sendPN(title, body, link, icon){
+
+			var xhr = new XMLHttpRequest();
+			var ue_registration_id = getUE_Registration_Id();
+			var data = "ue_registration_id="+ue_registration_id+"&title="+title+"&body="+body+"&link="+link+"&icon="+icon;
+			var url = "https://api.exapption.com/api/2/push_notifications/send";
+			xhr.open('POST', url, true);
+			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			xhr.setRequestHeader("API-KEY", "c8328b86-ae8f-423a-8edc-72a0b9cb55ca");
+			xhr.setRequestHeader("APP-KEY", "6726c3fc-73f7-409f-bd0a-cb9499a30a53");
+
+			xhr.onreadystatechange = function() {
+				//Call a function when the state changes.
+				if(xhr.readyState == 4) {
+					// var res = JSON.parse(xhr.responseText);
+					// alert(xhr.responseText);
+					objresponse = document.getElementById("span_pn_response");
+					objresponse.innerText = xhr.responseText;
+				}	
+			};
+			xhr.send(data);
+
+		}
+		
+	</script>
+
+	<!-- Demo app code ends here -->
+
+	<style type="text/css">
+
+		input[type="text"]{
+			color:#055ECC; 
+			border: 1px solid black; 
+			height: 25px;
+			width: 350;
+			font-size: 14px;
+			padding: 5px;	
+		}
+
+		input[type="button"]{
+			background-color: #340853; 
+		    border: none;
+		    color: white;
+		    padding: 12px 32px;
+		    text-align: center;
+		    text-decoration: none;
+		    display: inline-block;
+		    font-size: 16px;
+		    border-radius: 8px;
+		}
+
+		body {
+  			font-family: "Arial", Helvetica, Arial, sans-serif;
+		}
+
+		i { 
+			font-style: italic;
+			background-color: #FAF9F4;
+			color:maroon;
+		}
+
+		.mainTable {
+            border-radius: 22px;
+            border: 2px solid #cccccc;
+            width: 862px;
+            align: "center";
+        }
+
+        .sampleImages {
+        	height: 35px;
+        	vertical-align: middle;
+        }
+
+        .top {
+        	vertical-align: bottom;
+        }
+
+        li { line-height: 40px;}
+
+	</style>
+</head>
+<body id="body">
+	<table id="mainTable" name="mainTable" class="mainTable">
+		<tr>
+			<td id="#top">
+				<img 	src='https://storage.googleapis.com/userengagement/common/userengage.png' 
+						style='height:37px;width:185px;display: block;margin: 0 auto;'>
+			</td>
+		<tr>
+		<tr>
+			<td align="center">
+				<div>
+					<a href="#steps"> Integration  </a> || 
+					<a href="#demo"> Demo </a> ||
+					<a href="#api"> API </a>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td >
+				 <div id="demo">
+				 	<div> <h2> Demo (<a href="#top"><img class="top" src="https://storage.googleapis.com/userengagement/public_site/arrow-up-bold.png"></a>) </h2> 
+				 	</div>
+				 	<table cellpadding="10px" cellspacing="10px" >
+						<!-- <tr>
+							<td>
+								Enter your app_user_id 
+							
+								<input type="text" value="demo@exapption.com" id="txt_app_user_id" name="txt_app_user_id"> (Your app's unique id like email or name etc)
+							</td>
+						</tr> -->
+						</tr>
+							<td colspan="2">
+								 <a href="#" onclick="javascript:return register();">Enable Push Notifications</a> 
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								<a href="#" onclick="javascript:return unregister();">Disable Push Notifications</a> 
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Status : <span id="span_push_status" name="span_push_status">  -- </span>
+							</td>
+						 </tr>
+						 <tr>
+						 	<td>
+						 		ue_registration_id : <span id="span_ue_registration_id" name="span_ue_registration_id">  -- </span>
+								 ( Registation reference from exapption )
+						 	</td>
+						 </tr>
+						 <tr>
+					 		<td colspan="2">
+					 			<table>
+					 				<tr>
+					 					<td>
+					 						Title: 
+					 					</td>
+					 					<td>
+					 						<input type="text" name="txtTitle" id="txtTitle">
+					 					</td>
+					 				</tr>
+					 				<tr>
+					 					<td>
+					 						Body: 
+					 					</td>
+					 					<td>
+					 						<input type="text" name="txtBody" id="txtBody" >
+					 					</td>
+					 				</tr>
+					 				<tr>
+					 					<td>
+					 						link [optional]: 
+					 					</td>
+					 					<td>
+					 						<input type="text" name="txtlink" id="txtlink" > [complete url starting with http(s)]
+					 					</td>
+					 				</tr>
+					 				<tr>
+					 					<td>
+					 						icon [optional]: 
+					 					</td>
+					 					<td>
+					 						<input type="text" name="txticon" id="txticon" > [complete url starting with http(s)]
+					 					</td>
+					 				</tr>	
+					 				<tr>
+					 					<td style="height:15px;">
+					 						
+					 					</td>
+					 				</tr>
+
+					 				<tr>
+					 					<td colspan="2" align="left">
+					 						<input 	type="button" name="btnSendPN" id="btnSendPN"
+					 						 		value="Send PN" onclick="javascript: return sendNotification();">
+					 					</td>
+					 				</tr>	
+					 				<tr>
+					 					<td style="height:15px;">
+					 						
+					 					</td>
+					 				</tr>
+					 				<tr>
+					 					<td colspan="2" >
+					 						Response: <span id="span_pn_response" name="span_pn_response"></span>
+					 					</td>
+					 				<tr>
+
+					 			</table>
+					 		</td>
+						 </tr>
+					</table>
+							
+				 </div>
+				 <div id="steps">
+				 	<h2> Integration (<a href="#top"><img class="top" src="https://storage.googleapis.com/userengagement/public_site/arrow-up-bold.png"></a>)</h2> 
+					Steps to integrate web notifications to your website
+					<ol>
+						<li>
+							Step 1: Register and login to <a href="https://app.exapption.com" target="_new">app.exapption.com</a>
+						</li>
+						<li>
+							Step 2: Create an App by clicking on the <img class="sampleImages" src="https://storage.googleapis.com/userengagement/public_site/add_button.png"> add button. You will be redirected to home page where the newly created app is shown.
+						</li>
+						<li>
+							Step 3: Select the app menu <img class="sampleImages"  src="https://storage.googleapis.com/userengagement/public_site/vertical_menu.png"> top right corner of the app and select settings <img class="sampleImages"  src="https://storage.googleapis.com/userengagement/public_site/Settings.png">
+						</li>
+						<li>
+							Step 4: select the web tab <img class="sampleImages"  src="https://storage.googleapis.com/userengagement/public_site/web_tab.png"> from the settings 
+						</li>
+						<li>
+							Step 5: 
+							<ul>
+								<li>
+									Select and copy the copy Header js code and paste in your page in the header section i.e. inside the <b> head </b>  tags <head> exapption js code comes here ... </head> 	
+								</li>
+								<li>
+									create a js file with name <b> ue_worker.js </b> in the root folder of your application and copy the provided js code under ue_worker.js section. (Required only for HTTPS sites).
+								</li>
+							</ul>
+						</li>
+						<li>	
+							Step 6: Thats it. You are ready to bang !!!
+						</li>
+					</ol>
+				 </div>
+				 <div id="api">
+				 		<h2> API (<a href="#top"><img class="top" src="https://storage.googleapis.com/userengagement/public_site/arrow-up-bold.png"></a>)</h2> 
+				 		
+				 		Exapption provides callback functions to return the response. The inputs are taken from the website using an array push method.
+
+				 		<ol>
+				 			<li>
+				 				<b>Auto/Manual Registration</b>: Exapption can automatically prompt the user for allowing push notifications for your site. If the website wants to do it manually they are free to do so. By default it is configured to auto prompt.
+
+				 				User needs to add below tag to enable manual registration in the script provided
+				 				<br>
+				 				<i> p._ueq.push(['enable_manual_registration',true]); </i>
+				 				<br>
+				 				Website developer can trigger the registration they can call the below function with callback
+								<br>
+				 				<i> registerServiceWorker(onRegSuccess); </i>
+				 				<b>ue_registration_id</b> is received in the callback function 
+				 			</li>
+				 			<li>
+				 				<b>Set Application User ID</b>: Exapption can link the web application userID with Exapption registration ID. User needs to add below tag to link web application userID to ExapptionID "app_user_id"  
+
+				 				User needs to add below tag to enable manual registration in the script provided
+				 				<br>
+				 				<i> p._ueq.push(['app_user_id',"smith@Kalpah.com"]); </i>
+				 				<br>
+				 				Website developer can trigger the registration they can call the below function with callback
+								<br>
+				 				<i> registerServiceWorker(onRegSuccess); </i>
+				 				<b>ue_registration_id</b> is received in the callback function 
+				 			</li>
+				 			<li>
+				 				<b>Get Exapption Registration ID</b>: After subscription Exapption registration ID can be retrieved using below function call directly at any time if it is missed during registration. 
+				 				<br>
+				 				<i> getUE_Registration_Id(); </i>
+				 			</li>
+				 			<li>
+				 				<b>Verify Subsciption</b>: At any point of time web application can verify the subsciption status using the below method directly. It returns either "true" or "false" boolean type.
+				 				<br>
+				 				<i> is_subscribed(); </i>
+				 			</li>
+
+				 		</ol>
+
+				 </div>
+			</td>
+		 </tr>
+	</table>
+</body>
+</html>
